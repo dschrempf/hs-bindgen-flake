@@ -18,6 +18,19 @@
         "type": "github"
       }
     },
+    "hs-bindgen": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746377176,
+        "narHash": "sha256-EXqHFy90ccjo0ds44yjGiPBKVaPLdrbfmRKYkGFX3FE=",
+        "path": "/home/dominik/work/hs-bindgen",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/dominik/work/hs-bindgen",
+        "type": "path"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1746232882,
@@ -37,6 +50,7 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
+        "hs-bindgen": "hs-bindgen",
         "nixpkgs": "nixpkgs"
       }
     },

@@ -5,11 +5,17 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+  inputs.hs-bindgen = {
+    url = "path:/home/dominik/work/hs-bindgen";
+    flake = false;
+  };
+
   outputs =
     {
       self,
       flake-utils,
       nixpkgs,
+      hs-bindgen,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -25,7 +31,7 @@
           "hs-bindgen-test-runtime"
           "userland-capi"
         ];
-        hMkPackage = { callCabal2nix, ... }: name: callCabal2nix name (./. + "/${name}") { };
+        hMkPackage = { callCabal2nix, ... }: name: callCabal2nix name ("${hs-bindgen}/${name}") { };
         hOverlay = nfinal: nprev: {
           haskell = nprev.haskell // {
             packageOverrides =

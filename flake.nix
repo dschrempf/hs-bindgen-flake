@@ -91,6 +91,16 @@
             lpkgs.libclang
             lpkgs.llvm
           ];
+          # # The interplay of Template Haskell and `libclang` is problematic
+          # # because header files and libraries are not found in the Template
+          # # Haskell stage of GHC compilation, which is executed in a restricted
+          # # environment. Usually, setting `propagatedBuildInputs` is enough; not
+          # # so here, see below.
+          # propagatedBuildInputs = [
+          #   lpkgs.clang
+          #   lpkgs.libclang
+          #   lpkgs.llvm
+          # ];
           doBenchmark = true;
           withHoogle = true;
           shellHook = ''
@@ -99,6 +109,8 @@
             # we need to set include paths manually.
             C_INCLUDE_PATH="$(< ${lpkgs.clang}/nix-support/orig-libc-dev)/include:$(< ${pkgs.gcc}/nix-support/orig-cc)/lib/gcc/x86_64-unknown-linux-gnu/14.2.1/include"
             export C_INCLUDE_PATH
+            LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
+            export LD_LIBRARY_PATH
             # `rust-bindgen` allows usage of environment variables to define
             # clang arguments which seems a bit more elegant but does not work
             # for `hs-bindgen`. See `rust-bindgen-hook.sh` in Nixpkgs.

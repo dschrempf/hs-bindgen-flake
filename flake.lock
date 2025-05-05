@@ -21,14 +21,17 @@
     "hs-bindgen": {
       "flake": false,
       "locked": {
-        "lastModified": 1746377176,
-        "narHash": "sha256-EXqHFy90ccjo0ds44yjGiPBKVaPLdrbfmRKYkGFX3FE=",
-        "path": "/home/dominik/work/hs-bindgen",
-        "type": "path"
+        "lastModified": 1746254581,
+        "narHash": "sha256-Kwwg4PyzeqHHNbL78Lq/BwWU/WA6HEiE9uhj4nkHk2E=",
+        "owner": "well-typed",
+        "repo": "hs-bindgen",
+        "rev": "c1b37dc3a978bed1fa4639a2d7825e9be2698e47",
+        "type": "github"
       },
       "original": {
-        "path": "/home/dominik/work/hs-bindgen",
-        "type": "path"
+        "owner": "well-typed",
+        "repo": "hs-bindgen",
+        "type": "github"
       }
     },
     "nixpkgs": {

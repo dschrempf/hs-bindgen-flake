@@ -6,7 +6,7 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   inputs.hs-bindgen = {
-    url = "path:/home/dominik/work/hs-bindgen";
+    url = "github:well-typed/hs-bindgen";
     flake = false;
   };
 

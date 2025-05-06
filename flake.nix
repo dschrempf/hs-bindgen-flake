@@ -20,7 +20,7 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        ghcVersion = "ghc96";
+        ghcVersion = "ghc98";
         rBindgenVersion = "0.70.1";
         hsBindgenPkgNames = [
           "ansi-diff"
@@ -40,8 +40,7 @@
               // nixpkgs.lib.genAttrs hsBindgenPkgNames (hMkPackage hfinal)
               // {
                 debruijn = nfinal.haskell.lib.markUnbroken hprev.debruijn;
-                fin = hprev.fin_0_3_2;
-                universe-base = hprev.universe-base_1_1_4;
+                skew-list = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.skew-list);
               };
           };
         };

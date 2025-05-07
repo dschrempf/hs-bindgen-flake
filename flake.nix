@@ -82,6 +82,7 @@
             # Haskell.
             hpkgs.cabal-install
             hpkgs.ghc
+            # (hpkgs.ghc.override { stdenv = pkgs.clangStdenv; })
             hpkgs.haskell-language-server
             # Rust.
             pkgs.rust-bindgen

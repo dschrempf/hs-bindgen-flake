@@ -109,15 +109,21 @@
             # When accessing the `libclang` interface during GHC compilation
             # with Template Haskell, the Nixpkgs wrapper does not work, and so
             # we need to set include paths manually.
+
+            # TODO: Remove this when PR is merged.
             C_INCLUDE_PATH="$(< ${lpkgs.clang}/nix-support/orig-libc-dev)/include:$(< ${pkgs.gcc}/nix-support/orig-cc)/lib/gcc/x86_64-unknown-linux-gnu/14.2.1/include"
             export C_INCLUDE_PATH
             LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
             # Examples in manual require shared libraries.
+
             LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/:$LD_LIBRARY_PATH"
             export LD_LIBRARY_PATH
-            # `rust-bindgen` allows usage of environment variables to define
-            # clang arguments which seems a bit more elegant but does not work
-            # for `hs-bindgen`. See `rust-bindgen-hook.sh` in Nixpkgs.
+
+            # Similar to `rust-bindgen`, `hs-bindgen` allows usage of
+            # environment variables to define `clang` arguments. See
+            # `rust-bindgen-hook.sh` in Nixpkgs.
+            BINDGEN_EXTRA_CLANG_ARGS="$(< ${lpkgs.clang}/nix-support/cc-cflags) $(< ${lpkgs.clang}/nix-support/libc-cflags) $(< ${lpkgs.clang}/nix-support/libcxx-cxxflags) $NIX_CFLAGS_COMPILE"
+            export BINDGEN_EXTRA_CLANG_ARGS
           '';
         };
       }

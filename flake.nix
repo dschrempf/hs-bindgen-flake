@@ -116,7 +116,7 @@
             LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
             # Examples in manual require shared libraries.
 
-            LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/:$LD_LIBRARY_PATH"
+            LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
             export LD_LIBRARY_PATH
 
             # Similar to `rust-bindgen`, `hs-bindgen` allows usage of

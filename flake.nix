@@ -91,16 +91,6 @@
             lpkgs.libclang
             lpkgs.llvm
           ];
-          # # The interplay of Template Haskell and `libclang` is problematic
-          # # because header files and libraries are not found in the Template
-          # # Haskell stage of GHC compilation, which is executed in a restricted
-          # # environment. Usually, setting `propagatedBuildInputs` is enough; not
-          # # so here, see below.
-          # propagatedBuildInputs = [
-          #   lpkgs.clang
-          #   lpkgs.libclang
-          #   lpkgs.llvm
-          # ];
           doBenchmark = true;
           withHoogle = true;
           shellHook = ''
@@ -114,8 +104,14 @@
             C_INCLUDE_PATH="$(< ${lpkgs.clang}/nix-support/orig-libc-dev)/include:$(< ${pkgs.gcc}/nix-support/orig-cc)/lib/gcc/x86_64-unknown-linux-gnu/14.2.1/include"
             export C_INCLUDE_PATH
             LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
-            # Examples in manual require shared libraries.
 
+            # TODO: Setting the library path still seems to be necessary,
+            # because otherwise TH issues a warning that it cannot find
+            # `libclang.so`. However, the actual call to `libclang` does find
+            # all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see below).
+            LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
+
+            # Examples in manual require shared libraries.
             LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
             export LD_LIBRARY_PATH
 

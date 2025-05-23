@@ -98,14 +98,6 @@
           shellHook = ''
             PROJECT_ROOT=$(git rev-parse --show-toplevel)
             export PROJECT_ROOT
-            # When accessing the `libclang` interface during GHC compilation
-            # with Template Haskell, the Nixpkgs wrapper does not work, and so
-            # we need to set include paths manually.
-
-            # TODO: Remove this when PR is merged.
-            C_INCLUDE_PATH="$(< ${lpkgs.clang}/nix-support/orig-libc-dev)/include:$(< ${pkgs.gcc}/nix-support/orig-cc)/lib/gcc/x86_64-unknown-linux-gnu/14.2.1/include"
-            export C_INCLUDE_PATH
-            LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
 
             # TODO: Setting the library path still seems to be necessary,
             # because otherwise TH issues a warning that it cannot find

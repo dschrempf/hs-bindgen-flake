@@ -79,13 +79,15 @@
               haskellPackages.cabal-install
               haskellPackages.ghc
               haskellPackages.haskell-language-server
-              haskellPackages.friendly
               # Rust.
               pkgs.rust-bindgen
               # Clang.
               llvmPackages.clang
               llvmPackages.libclang
               llvmPackages.llvm
+              # Misc.
+              # # Fails to compiler for GHC 9.12.
+              # haskellPackages.friendly
             ];
             doBenchmark = true;
             withHoogle = true;

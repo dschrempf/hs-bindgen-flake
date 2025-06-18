@@ -20,7 +20,6 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        ghcVersion = "ghc98";
         rBindgenVersion = "0.70.1";
         hsBindgenPkgNames = [
           "ansi-diff"
@@ -67,54 +66,64 @@
             hOverlay
           ];
         };
-        hpkgs = pkgs.haskell.packages.${ghcVersion};
-        lpkgs = pkgs.llvmPackages;
-        hsBindgenPkgs = nixpkgs.lib.genAttrs hsBindgenPkgNames (n: hpkgs.${n});
+        hsBindgenPkgsWith = hpkgs: nixpkgs.lib.genAttrs hsBindgenPkgNames (n: hpkgs.${n});
+        devShellWith =
+          {
+            haskellPackages,
+            llvmPackages,
+          }:
+          haskellPackages.shellFor {
+            packages = _: builtins.attrValues (hsBindgenPkgsWith haskellPackages);
+            nativeBuildInputs = [
+              # Haskell.
+              haskellPackages.cabal-install
+              haskellPackages.ghc
+              haskellPackages.haskell-language-server
+              haskellPackages.friendly
+              # Rust.
+              pkgs.rust-bindgen
+              # Clang.
+              llvmPackages.clang
+              llvmPackages.libclang
+              llvmPackages.llvm
+            ];
+            doBenchmark = true;
+            withHoogle = true;
+            shellHook = ''
+              PROJECT_ROOT=$(git rev-parse --show-toplevel)
+              export PROJECT_ROOT
+
+              # TODO: Setting the library path still seems to be necessary,
+              # because otherwise TH issues a warning that it cannot find
+              # `libclang.so`. However, the actual call to `libclang` does find
+              # all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see below).
+              LD_LIBRARY_PATH="${llvmPackages.libclang.lib}/lib"
+
+              # Examples in manual require shared libraries.
+              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+              export LD_LIBRARY_PATH
+
+              # Similar to `rust-bindgen`, `hs-bindgen` allows usage of
+              # environment variables to define `clang` arguments. See
+              # `rust-bindgen-hook.sh` in Nixpkgs.
+              BINDGEN_EXTRA_CLANG_ARGS="$(< ${llvmPackages.clang}/nix-support/cc-cflags) $(< ${llvmPackages.clang}/nix-support/libc-cflags) $(< ${llvmPackages.clang}/nix-support/libcxx-cxxflags) $NIX_CFLAGS_COMPILE"
+              export BINDGEN_EXTRA_CLANG_ARGS
+            '';
+          };
       in
       {
-        packages = hsBindgenPkgs // {
-          # Does not build yet, because package versions in Nixpkgs are outdated.
-          default = hsBindgenPkgs.hs-bindgen;
+        packages = {
+          default = (hsBindgenPkgsWith pkgs.haskellPackages).hs-bindgen;
         };
-        devShells.default = hpkgs.shellFor {
-          packages = _: (builtins.attrValues hsBindgenPkgs);
-          nativeBuildInputs = [
-            # Haskell.
-            hpkgs.cabal-install
-            hpkgs.ghc
-            hpkgs.haskell-language-server
-            # Rust.
-            pkgs.rust-bindgen
-            # Clang.
-            lpkgs.clang
-            lpkgs.libclang
-            lpkgs.llvm
-
-            # Misc.
-            hpkgs.friendly
-          ];
-          doBenchmark = true;
-          withHoogle = true;
-          shellHook = ''
-            PROJECT_ROOT=$(git rev-parse --show-toplevel)
-            export PROJECT_ROOT
-
-            # TODO: Setting the library path still seems to be necessary,
-            # because otherwise TH issues a warning that it cannot find
-            # `libclang.so`. However, the actual call to `libclang` does find
-            # all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see below).
-            LD_LIBRARY_PATH="${lpkgs.libclang.lib}/lib"
-
-            # Examples in manual require shared libraries.
-            LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-            export LD_LIBRARY_PATH
-
-            # Similar to `rust-bindgen`, `hs-bindgen` allows usage of
-            # environment variables to define `clang` arguments. See
-            # `rust-bindgen-hook.sh` in Nixpkgs.
-            BINDGEN_EXTRA_CLANG_ARGS="$(< ${lpkgs.clang}/nix-support/cc-cflags) $(< ${lpkgs.clang}/nix-support/libc-cflags) $(< ${lpkgs.clang}/nix-support/libcxx-cxxflags) $NIX_CFLAGS_COMPILE"
-            export BINDGEN_EXTRA_CLANG_ARGS
-          '';
+        devShells = {
+          ghc912 = devShellWith {
+            haskellPackages = pkgs.haskell.packages.ghc912;
+            llvmPackages = pkgs.llvmPackages;
+          };
+          default = devShellWith {
+            haskellPackages = pkgs.haskellPackages;
+            llvmPackages = pkgs.llvmPackages;
+          };
         };
       }
     );

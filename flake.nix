@@ -81,6 +81,7 @@
               haskellPackages.haskell-language-server
               # Rust.
               pkgs.rust-bindgen
+              pkgs.rustfmt
               # Clang.
               llvmPackages.clang
               llvmPackages.libclang

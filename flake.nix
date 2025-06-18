@@ -117,7 +117,17 @@
         packages = {
           default = (hsBindgenPkgsWith pkgs.haskellPackages).hs-bindgen;
         };
+        # TODO: Automatically create a matrix for a list of GHC and LLVM versions.
         devShells = {
+          ghc98 = devShellWith {
+            haskellPackages = pkgs.haskell.packages.ghc98;
+            llvmPackages = pkgs.llvmPackages;
+          };
+          ghc910 = devShellWith {
+            haskellPackages = pkgs.haskell.packages.ghc910;
+            llvmPackages = pkgs.llvmPackages;
+          };
+          # Does not work. Multiple packages expect `base` 4.20 or lower.
           ghc912 = devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc912;
             llvmPackages = pkgs.llvmPackages;

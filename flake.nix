@@ -20,7 +20,6 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        rBindgenVersion = "0.70.1";
         hsBindgenPkgNames = [
           "ansi-diff"
           "c-expr"
@@ -43,21 +42,22 @@
               };
           };
         };
-        # See ./test/internal/Test/Internal/Rust.hs::rustBindgenVersion.
+        # NOTE: May be used to overwrite the version of `rust-bindgen` which has
+        # to align with the one used to create the fixtures.
         rOverlay = final: prev: {
-          rust-bindgen-unwrapped = prev.rust-bindgen-unwrapped.overrideAttrs (old: rec {
-            version = rBindgenVersion;
-            src = prev.fetchCrate {
-              pname = "bindgen-cli";
-              inherit version;
-              hash = "sha256-6FRcW/VGqlmLjb64UYqk21HmQ8u0AdVD3S2F+9D/vQo=";
-            };
-            cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-              pname = old.pname;
-              inherit version src;
-              hash = "sha256-r4ZI+uybK3MzJMYlRwmNhZMBO3aMKCIIznOOdQ0ReqU=";
-            };
-          });
+          # rust-bindgen-unwrapped = prev.rust-bindgen-unwrapped.overrideAttrs (old: rec {
+          #   version = "0.70.1";
+          #   src = prev.fetchCrate {
+          #     pname = "bindgen-cli";
+          #     inherit version;
+          #     hash = "sha256-6FRcW/VGqlmLjb64UYqk21HmQ8u0AdVD3S2F+9D/vQo=";
+          #   };
+          #   cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+          #     pname = old.pname;
+          #     inherit version src;
+          #     hash = "sha256-r4ZI+uybK3MzJMYlRwmNhZMBO3aMKCIIznOOdQ0ReqU=";
+          #   };
+          # });
         };
         pkgs = import nixpkgs {
           inherit system;
@@ -87,7 +87,7 @@
               llvmPackages.libclang
               llvmPackages.llvm
               # Misc.
-              # # Fails to compiler for GHC 9.12.
+              # # Fails to compile for GHC 9.12.
               # haskellPackages.friendly
             ];
             doBenchmark = true;

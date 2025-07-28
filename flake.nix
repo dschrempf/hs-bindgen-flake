@@ -37,7 +37,7 @@
               nprev.haskell.packageOverrides hfinal hprev
               // nixpkgs.lib.genAttrs hsBindgenPkgNames (hMkPackage hfinal)
               // {
-                debruijn = nfinal.haskell.lib.markUnbroken hprev.debruijn;
+                debruijn = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.debruijn);
                 skew-list = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.skew-list);
               };
           };

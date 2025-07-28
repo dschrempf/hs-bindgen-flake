@@ -45,19 +45,19 @@
         # NOTE: May be used to overwrite the version of `rust-bindgen` which has
         # to align with the one used to create the fixtures.
         rOverlay = final: prev: {
-          # rust-bindgen-unwrapped = prev.rust-bindgen-unwrapped.overrideAttrs (old: rec {
-          #   version = "0.70.1";
-          #   src = prev.fetchCrate {
-          #     pname = "bindgen-cli";
-          #     inherit version;
-          #     hash = "sha256-6FRcW/VGqlmLjb64UYqk21HmQ8u0AdVD3S2F+9D/vQo=";
-          #   };
-          #   cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-          #     pname = old.pname;
-          #     inherit version src;
-          #     hash = "sha256-r4ZI+uybK3MzJMYlRwmNhZMBO3aMKCIIznOOdQ0ReqU=";
-          #   };
-          # });
+          rust-bindgen-unwrapped = prev.rust-bindgen-unwrapped.overrideAttrs (old: rec {
+            version = "0.71.1";
+            src = prev.fetchCrate {
+              pname = "bindgen-cli";
+              inherit version;
+              hash = "sha256-RL9P0dPYWLlEGgGWZuIvyULJfH+c/B+3sySVadJQS3w=";
+            };
+            cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+              pname = old.pname;
+              inherit version src;
+              hash = "sha256-4EyDjHreFFFSGf7UoftCh6eI/8nfIP1ANlYWq0K8a3I=";
+            };
+          });
         };
         pkgs = import nixpkgs {
           inherit system;

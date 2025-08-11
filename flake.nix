@@ -38,6 +38,8 @@
               // nixpkgs.lib.genAttrs hsBindgenPkgNames (hMkPackage hfinal)
               // {
                 debruijn = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.debruijn);
+                # See https://gitlab.haskell.org/ghc/ghc/-/issues/25681.
+                optics = nfinal.haskell.lib.dontCheck hprev.optics;
                 skew-list = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.skew-list);
               };
           };
@@ -86,9 +88,6 @@
               llvmPackages.clang
               llvmPackages.libclang
               llvmPackages.llvm
-              # Misc.
-              # # Fails to compile for GHC 9.12.
-              # haskellPackages.friendly
             ];
             doBenchmark = true;
             withHoogle = true;
@@ -118,7 +117,6 @@
         packages = {
           default = (hsBindgenPkgsWith pkgs.haskellPackages).hs-bindgen;
         };
-        # TODO: Automatically create a matrix for a list of GHC and LLVM versions.
         devShells = {
           ghc98 = devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc98;
@@ -128,13 +126,12 @@
             haskellPackages = pkgs.haskell.packages.ghc910;
             llvmPackages = pkgs.llvmPackages;
           };
-          # Does not work. Multiple packages expect `base` 4.20 or lower.
           ghc912 = devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc912;
             llvmPackages = pkgs.llvmPackages;
           };
           default = devShellWith {
-            haskellPackages = pkgs.haskellPackages;
+            haskellPackages = pkgs.haskell.packages.ghc912;
             llvmPackages = pkgs.llvmPackages;
           };
         };

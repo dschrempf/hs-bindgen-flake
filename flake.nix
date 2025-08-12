@@ -88,6 +88,8 @@
               llvmPackages.clang
               llvmPackages.libclang
               llvmPackages.llvm
+              # Bindgen hook.
+              pkgs.rustPlatform.bindgenHook
             ];
             doBenchmark = true;
             withHoogle = true;
@@ -98,18 +100,13 @@
               # TODO: Setting the library path still seems to be necessary,
               # because otherwise TH issues a warning that it cannot find
               # `libclang.so`. However, the actual call to `libclang` does find
-              # all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see below).
-              LD_LIBRARY_PATH="${llvmPackages.libclang.lib}/lib"
+              # all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see
+              # `bindgenHook` provided by Nixpkgs).
 
-              # Examples in manual require shared libraries.
-              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+              # The examples in manual also use shared libraries.
+
+              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/ $NIX_LDFLAGS"
               export LD_LIBRARY_PATH
-
-              # Similar to `rust-bindgen`, `hs-bindgen` allows usage of
-              # environment variables to define `clang` arguments. See
-              # `rust-bindgen-hook.sh` in Nixpkgs.
-              BINDGEN_EXTRA_CLANG_ARGS="$(< ${llvmPackages.clang}/nix-support/cc-cflags) $(< ${llvmPackages.clang}/nix-support/libc-cflags) $(< ${llvmPackages.clang}/nix-support/libcxx-cxxflags) $NIX_CFLAGS_COMPILE"
-              export BINDGEN_EXTRA_CLANG_ARGS
             '';
           };
       in

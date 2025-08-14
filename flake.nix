@@ -105,7 +105,7 @@
 
               # The examples in manual also use shared libraries.
 
-              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c/:${llvmPackages.libclang.lib}/lib"
+              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c:${llvmPackages.libclang.lib}/lib"
               export LD_LIBRARY_PATH
             '';
           };

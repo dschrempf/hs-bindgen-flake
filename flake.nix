@@ -107,6 +107,9 @@
 
               LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c:${llvmPackages.libclang.lib}/lib"
               export LD_LIBRARY_PATH
+
+              # PATH="$HOME/.local/bin:$PATH"
+              # export PATH
             '';
           };
       in

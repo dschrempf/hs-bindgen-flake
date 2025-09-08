@@ -90,6 +90,7 @@
               llvmPackages.llvm
               # Bindgen hook.
               pkgs.rustPlatform.bindgenHook
+              pkgs.libpcap
             ];
             doBenchmark = true;
             withHoogle = true;
@@ -97,16 +98,22 @@
               PROJECT_ROOT=$(git rev-parse --show-toplevel)
               export PROJECT_ROOT
 
-              # TODO: Setting the library path still seems to be necessary,
-              # because otherwise TH issues a warning that it cannot find
-              # `libclang.so`. However, the actual call to `libclang` does find
-              # all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see
+              # TODO: Setting the linker library path still seems to be
+              # necessary, because otherwise TH issues a warning that it cannot
+              # find `libclang.so`. However, the actual call to `libclang` does
+              # find all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see
               # `bindgenHook` provided by Nixpkgs).
 
               # The examples in manual also use shared libraries.
 
               LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c:${llvmPackages.libclang.lib}/lib"
               export LD_LIBRARY_PATH
+
+              # We set the builtin include directory using
+              # BINDGEN_EXTRA_CLANG_ARGS (see `bindgenHook` provided by
+              # Nixpkgs).
+              BINDGEN_BUILTIN_INCLUDE_DIR=disable
+              export BINDGEN_BUILTIN_INCLUDE_DIR
 
               # PATH="$HOME/.local/bin:$PATH"
               # export PATH

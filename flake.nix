@@ -90,7 +90,13 @@
               llvmPackages.llvm
               # Bindgen hook.
               pkgs.rustPlatform.bindgenHook
+              # Example libraries we generate bindings for.
+              ## Library `libcap`.
               pkgs.libpcap
+              ## Library `wlroots`.
+              pkgs.pixman
+              pkgs.wayland
+              pkgs.wlroots
             ];
             doBenchmark = true;
             withHoogle = true;

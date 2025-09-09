@@ -90,6 +90,16 @@
               llvmPackages.libclang
               llvmPackages.llvm
               # Bindgen hook.
+              #
+              # NOTE: The `bindgen` hook just collects all library dependencies
+              # in the closure and adds them to the include directory. Since we
+              # have GCC in the closure (and not only Clang), the GCC includes
+              # end up in BINDGEN_EXTRA_CLANG_ARGS. I think we should just live
+              # with that.
+              #
+              # We could use a `clangStdenv` Nixpkgs overlay, but that requires
+              # recompilation of the complete toolchain; see, e.g.,
+              # https://nixos.wiki/wiki/Using_Clang_instead_of_GCC.
               pkgs.rustPlatform.bindgenHook
             ]
             ++

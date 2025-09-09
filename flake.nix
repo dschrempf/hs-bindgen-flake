@@ -22,7 +22,7 @@
       let
         hsBindgenPkgNames = [
           "ansi-diff"
-          "c-expr"
+          "c-expr-runtime"
           "clang"
           "hs-bindgen"
           "hs-bindgen-runtime"
@@ -73,6 +73,7 @@
           {
             haskellPackages,
             llvmPackages,
+            additionalPackages ? [ ],
           }:
           haskellPackages.shellFor {
             packages = _: builtins.attrValues (hsBindgenPkgsWith haskellPackages);
@@ -90,14 +91,11 @@
               llvmPackages.llvm
               # Bindgen hook.
               pkgs.rustPlatform.bindgenHook
-              # Example libraries we generate bindings for.
-              ## Library `libcap`.
-              pkgs.libpcap
-              ## Library `wlroots`.
-              pkgs.pixman
-              pkgs.wayland
-              pkgs.wlroots
-            ];
+            ]
+            ++
+              # Additional packages (e.g., of example libraries to generate
+              # bindings for).
+              additionalPackages;
             doBenchmark = true;
             withHoogle = true;
             shellHook = ''
@@ -146,6 +144,24 @@
           default = devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc912;
             llvmPackages = pkgs.llvmPackages;
+          };
+          # Example `libcap`.
+          pcap = devShellWith {
+            haskellPackages = pkgs.haskell.packages.ghc912;
+            llvmPackages = pkgs.llvmPackages;
+            additionalPackages = [
+              pkgs.libpcap
+            ];
+          };
+          # Example `wlroots`.
+          wlroots = devShellWith {
+            haskellPackages = pkgs.haskell.packages.ghc912;
+            llvmPackages = pkgs.llvmPackages;
+            additionalPackages = [
+              pkgs.pixman
+              pkgs.wayland
+              pkgs.wlroots
+            ];
           };
         };
       }

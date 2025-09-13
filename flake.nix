@@ -27,7 +27,6 @@
           "hs-bindgen"
           "hs-bindgen-runtime"
           "hs-bindgen-test-runtime"
-          "userland-capi"
         ];
         hMkPackage = { callCabal2nix, ... }: name: callCabal2nix name ("${hs-bindgen}/${name}") { };
         hOverlay = nfinal: nprev: {

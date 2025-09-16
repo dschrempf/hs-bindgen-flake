@@ -73,6 +73,7 @@
             haskellPackages,
             llvmPackages,
             additionalPackages ? [ ],
+            appendToShellHook ? "",
           }:
           haskellPackages.shellFor {
             packages = _: builtins.attrValues (hsBindgenPkgsWith haskellPackages);
@@ -130,7 +131,8 @@
 
               # PATH="$HOME/.local/bin:$PATH"
               # export PATH
-            '';
+            ''
+            + appendToShellHook;
           };
       in
       {
@@ -171,6 +173,9 @@
               pkgs.wayland
               pkgs.wlroots
             ];
+            appendToShellHook = ''
+              BINDGEN_EXTRA_CLANG_ARGS="-isystem ${pkgs.wlroots}/include/wlroots-0.19 ''${BINDGEN_EXTRA_CLANG_ARGS}"
+            '';
           };
         };
       }

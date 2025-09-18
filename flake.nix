@@ -5,44 +5,15 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-  inputs.hs-bindgen = {
-    url = "github:well-typed/hs-bindgen";
-    flake = false;
-  };
-
   outputs =
     {
       self,
       flake-utils,
       nixpkgs,
-      hs-bindgen,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        hsBindgenPkgNames = [
-          "ansi-diff"
-          "c-expr-runtime"
-          "clang"
-          "hs-bindgen"
-          "hs-bindgen-runtime"
-          "hs-bindgen-test-runtime"
-        ];
-        hMkPackage = { callCabal2nix, ... }: name: callCabal2nix name ("${hs-bindgen}/${name}") { };
-        hOverlay = nfinal: nprev: {
-          haskell = nprev.haskell // {
-            packageOverrides =
-              hfinal: hprev:
-              nprev.haskell.packageOverrides hfinal hprev
-              // nixpkgs.lib.genAttrs hsBindgenPkgNames (hMkPackage hfinal)
-              // {
-                debruijn = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.debruijn);
-                # See https://gitlab.haskell.org/ghc/ghc/-/issues/25681.
-                optics = nfinal.haskell.lib.dontCheck hprev.optics;
-                skew-list = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.skew-list);
-              };
-          };
-        };
         # NOTE: May be used to overwrite the version of `rust-bindgen` which has
         # to align with the one used to create the fixtures.
         rOverlay = final: prev: {
@@ -64,10 +35,8 @@
           inherit system;
           overlays = [
             rOverlay
-            hOverlay
           ];
         };
-        hsBindgenPkgsWith = hpkgs: nixpkgs.lib.genAttrs hsBindgenPkgNames (n: hpkgs.${n});
         devShellWith =
           {
             haskellPackages,
@@ -75,8 +44,7 @@
             additionalPackages ? [ ],
             appendToShellHook ? "",
           }:
-          haskellPackages.shellFor {
-            packages = _: builtins.attrValues (hsBindgenPkgsWith haskellPackages);
+          pkgs.mkShell {
             nativeBuildInputs = [
               # Haskell.
               haskellPackages.cabal-install
@@ -106,8 +74,6 @@
               # Additional packages (e.g., of example libraries to generate
               # bindings for).
               additionalPackages;
-            doBenchmark = true;
-            withHoogle = true;
             shellHook = ''
               PROJECT_ROOT=$(git rev-parse --show-toplevel)
               export PROJECT_ROOT
@@ -136,9 +102,6 @@
           };
       in
       {
-        packages = {
-          default = (hsBindgenPkgsWith pkgs.haskellPackages).hs-bindgen;
-        };
         devShells = {
           ghc98 = devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc98;

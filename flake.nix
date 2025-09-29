@@ -40,53 +40,7 @@
             rustBindgenOverlay
           ];
         };
-        devShellWith =
-          {
-            haskellPackages,
-            llvmPackages,
-            additionalPackages ? [ ],
-            appendToShellHook ? "",
-          }:
-          haskellPackages.shellFor {
-            packages = p: [ p.hs-bindgen ];
-            nativeBuildInputs = [
-              # Haskell.
-              haskellPackages.cabal-install
-              haskellPackages.ghc
-              haskellPackages.haskell-language-server
-              # Rust.
-              pkgs.rust-bindgen
-              pkgs.rustfmt
-              # Clang.
-              llvmPackages.clang
-              llvmPackages.libclang
-              llvmPackages.llvm
-              # Bindgen hook.
-              #
-              # NOTE: `hsBindgenHook` collects all library dependencies in the
-              # closure and adds their `CFLAGS` and `CCFLAGS` to
-              # `BINDGEN_EXTRA_CLANG_ARGS`. Since we have GCC in the closure
-              # (and not only Clang), the GCC includes end up in
-              # BINDGEN_EXTRA_CLANG_ARGS which is suboptimal. We could use a
-              # `clangStdenv` Nixpkgs overlay, but that requires recompilation
-              # of the complete toolchain; see, e.g.,
-              # https://nixos.wiki/wiki/Using_Clang_instead_of_GCC.
-              pkgs.hsBindgenHook
-            ]
-            ++
-              # Additional packages (e.g., of example libraries to generate
-              # bindings for).
-              additionalPackages;
-            shellHook = ''
-              PROJECT_ROOT=$(git rev-parse --show-toplevel)
-              export PROJECT_ROOT
-
-              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c''${LD_LIBRARY_PATH:+:''${LD_LIBRARY_PATH}}"
-              export LD_LIBRARY_PATH
-            ''
-            + appendToShellHook;
-            withHoogle = true;
-          };
+        hsBindgenDev = import ./nix/hs-bindgen-dev.nix { inherit pkgs; };
       in
       {
         packages = {
@@ -94,24 +48,12 @@
         };
 
         devShells = {
-          ghc98 = devShellWith {
-            haskellPackages = pkgs.haskell.packages.ghc98;
-            llvmPackages = pkgs.llvmPackages;
+          inherit (hsBindgenDev) matrix;
+          default = hsBindgenDev.devShellWith {
+            inherit (pkgs) haskellPackages llvmPackages;
           };
-          ghc910 = devShellWith {
-            haskellPackages = pkgs.haskell.packages.ghc910;
-            llvmPackages = pkgs.llvmPackages;
-          };
-          ghc912 = devShellWith {
-            haskellPackages = pkgs.haskell.packages.ghc912;
-            llvmPackages = pkgs.llvmPackages;
-          };
-          default = devShellWith {
-            haskellPackages = pkgs.haskell.packages.ghc912;
-            llvmPackages = pkgs.llvmPackages;
-          };
-          # Example `libcap`.
-          pcap = devShellWith {
+          # Example `libpcap`.
+          pcap = hsBindgenDev.devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc912;
             llvmPackages = pkgs.llvmPackages;
             additionalPackages = [
@@ -119,7 +61,7 @@
             ];
           };
           # Example `wlroots`.
-          wlroots = devShellWith {
+          wlroots = hsBindgenDev.devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc912;
             llvmPackages = pkgs.llvmPackages;
             additionalPackages = [

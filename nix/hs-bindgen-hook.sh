@@ -1,0 +1,23 @@
+# Populate additional environment variables required by `hs-bindgen`.
+
+populateHsBindgenEnv() {
+    # Inform `hs-bindgen` about Nix-specific `CFLAGS` and `CCFLAGS`. In contrast
+    # to `rust-bindgen-hook.sh` (see Nixpkgs), we do not set `CXXFLAGS`.
+    BINDGEN_EXTRA_CLANG_ARGS="$(<@clang@/nix-support/cc-cflags) $(<@clang@/nix-support/libc-cflags) $NIX_CFLAGS_COMPILE"
+    export BINDGEN_EXTRA_CLANG_ARGS
+
+    # Inform `hs-bindgen` that it does not have to perform heuristic search for
+    # the builtin include directory. (We set the builtin include directory using
+    # `BINDGEN_EXTRA_CLANG_ARGS`).
+    BINDGEN_BUILTIN_INCLUDE_DIR=disable
+    export BINDGEN_BUILTIN_INCLUDE_DIR
+
+    # TODO: Setting the linker library path still seems to be necessary, because
+    # otherwise TH issues a warning that it cannot find `libclang.so`. However,
+    # the actual call to `libclang` does find all libraries due to
+    # BINDGEN_EXTRA_CLANG_ARGS (see `bindgenHook` provided by Nixpkgs).
+    LD_LIBRARY_PATH="@libclang@/lib"
+    export LD_LIBRARY_PATH
+}
+
+postHook="${postHook:-}"$'\n'"populateHsBindgenEnv"$'\n'

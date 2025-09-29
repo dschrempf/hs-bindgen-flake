@@ -37,6 +37,7 @@
             rOverlay
           ];
         };
+        hsBindgenHook = pkgs.callPackage ./nix/hsBindgenHook.nix { };
         devShellWith =
           {
             haskellPackages,
@@ -59,16 +60,15 @@
               llvmPackages.llvm
               # Bindgen hook.
               #
-              # NOTE: The `bindgen` hook just collects all library dependencies
-              # in the closure and adds them to the include directory. Since we
-              # have GCC in the closure (and not only Clang), the GCC includes
-              # end up in BINDGEN_EXTRA_CLANG_ARGS. I think we should just live
-              # with that.
-              #
-              # We could use a `clangStdenv` Nixpkgs overlay, but that requires
-              # recompilation of the complete toolchain; see, e.g.,
+              # NOTE: `hsBindgenHook` collects all library dependencies in the
+              # closure and adds their `CFLAGS` and `CCFLAGS` to
+              # `BINDGEN_EXTRA_CLANG_ARGS`. Since we have GCC in the closure
+              # (and not only Clang), the GCC includes end up in
+              # BINDGEN_EXTRA_CLANG_ARGS which is suboptimal. We could use a
+              # `clangStdenv` Nixpkgs overlay, but that requires recompilation
+              # of the complete toolchain; see, e.g.,
               # https://nixos.wiki/wiki/Using_Clang_instead_of_GCC.
-              pkgs.rustPlatform.bindgenHook
+              hsBindgenHook
             ]
             ++
               # Additional packages (e.g., of example libraries to generate
@@ -78,30 +78,17 @@
               PROJECT_ROOT=$(git rev-parse --show-toplevel)
               export PROJECT_ROOT
 
-              # TODO: Setting the linker library path still seems to be
-              # necessary, because otherwise TH issues a warning that it cannot
-              # find `libclang.so`. However, the actual call to `libclang` does
-              # find all libraries due to BINDGEN_EXTRA_CLANG_ARGS (see
-              # `bindgenHook` provided by Nixpkgs).
-
-              # The examples in manual also use shared libraries.
-
-              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c:${llvmPackages.libclang.lib}/lib"
+              LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c''${LD_LIBRARY_PATH:+:''${LD_LIBRARY_PATH}}"
               export LD_LIBRARY_PATH
-
-              # We set the builtin include directory using
-              # BINDGEN_EXTRA_CLANG_ARGS (see `bindgenHook` provided by
-              # Nixpkgs).
-              BINDGEN_BUILTIN_INCLUDE_DIR=disable
-              export BINDGEN_BUILTIN_INCLUDE_DIR
-
-              # PATH="$HOME/.local/bin:$PATH"
-              # export PATH
             ''
             + appendToShellHook;
           };
       in
       {
+        packages = {
+          inherit hsBindgenHook;
+        };
+
         devShells = {
           ghc98 = devShellWith {
             haskellPackages = pkgs.haskell.packages.ghc98;

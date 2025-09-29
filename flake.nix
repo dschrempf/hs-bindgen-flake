@@ -5,15 +5,54 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+  inputs.libclang = {
+    url = "github:well-typed/libclang";
+    flake = false;
+  };
+
+  inputs.hs-bindgen = {
+    url = "github:well-typed/hs-bindgen";
+    flake = false;
+  };
+
   outputs =
     {
       self,
       flake-utils,
       nixpkgs,
+      #
+      libclang,
+      hs-bindgen,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
+        hsBindgenPkgNames = [
+          "ansi-diff"
+          "c-expr-runtime"
+          "c-expr-dsl"
+          "hs-bindgen"
+          "hs-bindgen-runtime"
+          "hs-bindgen-test-runtime"
+        ];
+        hMkPackage = { callCabal2nix, ... }: name: callCabal2nix name ("${hs-bindgen}/${name}") { };
+        hOverlay = nfinal: nprev: {
+          haskell = nprev.haskell // {
+            packageOverrides =
+              hfinal: hprev:
+              nprev.haskell.packageOverrides hfinal hprev
+              // nixpkgs.lib.genAttrs hsBindgenPkgNames (hMkPackage hfinal)
+              // {
+                libclang-bindings = hfinal.callCabal2nix "libclang-bindings" "${libclang}" { };
+              }
+              // {
+                debruijn = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.debruijn);
+                # See https://gitlab.haskell.org/ghc/ghc/-/issues/25681.
+                # optics = nfinal.haskell.lib.dontCheck hprev.optics;
+                skew-list = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.skew-list);
+              };
+          };
+        };
         # NOTE: May be used to overwrite the version of `rust-bindgen` which has
         # to align with the one used to create the fixtures.
         rOverlay = final: prev: {
@@ -34,10 +73,14 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
+            hOverlay
             rOverlay
           ];
         };
         hsBindgenHook = pkgs.callPackage ./nix/hsBindgenHook.nix { };
+        hsBindgen = pkgs.callPackage ./nix/hsBindgen.nix {
+          inherit hsBindgenHook;
+        };
         devShellWith =
           {
             haskellPackages,
@@ -87,6 +130,7 @@
       {
         packages = {
           inherit hsBindgenHook;
+          inherit hsBindgen;
         };
 
         devShells = {

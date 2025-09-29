@@ -18,13 +18,45 @@
         "type": "github"
       }
     },
+    "hs-bindgen": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759133571,
+        "narHash": "sha256-23cwWwHoa/M/mGAC3wXKW0sHgFcuayxLyXlikbzm2xI=",
+        "owner": "well-typed",
+        "repo": "hs-bindgen",
+        "rev": "e5f98433cd539a256127a20bfb81b6ca35e25924",
+        "type": "github"
+      },
+      "original": {
+        "owner": "well-typed",
+        "repo": "hs-bindgen",
+        "type": "github"
+      }
+    },
+    "libclang": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1758260413,
+        "narHash": "sha256-e0qrO6PLjy6kz6/ErMG7QTSq78POws7QETO2SlhSDlo=",
+        "owner": "well-typed",
+        "repo": "libclang",
+        "rev": "8105e5e7bd30223a755185ee9fb6ec3727f8360b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "well-typed",
+        "repo": "libclang",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1758198701,
-        "narHash": "sha256-7To75JlpekfUmdkUZewnT6MoBANS0XVypW6kjUOXQwc=",
+        "lastModified": 1758690382,
+        "narHash": "sha256-NY3kSorgqE5LMm1LqNwGne3ZLMF2/ILgLpFr1fS4X3o=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0147c2f1d54b30b5dd6d4a8c8542e8d7edf93b5d",
+        "rev": "e643668fd71b949c53f8626614b21ff71a07379d",
         "type": "github"
       },
       "original": {
@@ -37,6 +69,8 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
+        "hs-bindgen": "hs-bindgen",
+        "libclang": "libclang",
         "nixpkgs": "nixpkgs"
       }
     },

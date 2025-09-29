@@ -18,45 +18,47 @@
         "type": "github"
       }
     },
-    "hs-bindgen": {
+    "hs-bindgen-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1759133571,
-        "narHash": "sha256-23cwWwHoa/M/mGAC3wXKW0sHgFcuayxLyXlikbzm2xI=",
+        "lastModified": 1759149981,
+        "narHash": "sha256-SlYM1W8GPyI/xNeVp8/+YNtSjG3Vv3mDY8uxeLeBlrs=",
         "owner": "well-typed",
         "repo": "hs-bindgen",
-        "rev": "e5f98433cd539a256127a20bfb81b6ca35e25924",
+        "rev": "52a744c2a21ca483c7f7fe3acd216c4016f2587d",
         "type": "github"
       },
       "original": {
         "owner": "well-typed",
+        "ref": "dom/1019/loosen-bounds",
         "repo": "hs-bindgen",
         "type": "github"
       }
     },
-    "libclang": {
+    "libclang-bindings-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1758260413,
-        "narHash": "sha256-e0qrO6PLjy6kz6/ErMG7QTSq78POws7QETO2SlhSDlo=",
+        "lastModified": 1759144922,
+        "narHash": "sha256-JuKZU/0VOiFRSDrrsPoegu8LJXpnRHtgFO1nise5duw=",
         "owner": "well-typed",
         "repo": "libclang",
-        "rev": "8105e5e7bd30223a755185ee9fb6ec3727f8360b",
+        "rev": "68bb97dd401d8a68bb8110f068f717403931891f",
         "type": "github"
       },
       "original": {
         "owner": "well-typed",
+        "ref": "dom/loosen-bounds",
         "repo": "libclang",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1758690382,
-        "narHash": "sha256-NY3kSorgqE5LMm1LqNwGne3ZLMF2/ILgLpFr1fS4X3o=",
+        "lastModified": 1759036355,
+        "narHash": "sha256-0m27AKv6ka+q270dw48KflE0LwQYrO7Fm4/2//KCVWg=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e643668fd71b949c53f8626614b21ff71a07379d",
+        "rev": "e9f00bd893984bc8ce46c895c3bf7cac95331127",
         "type": "github"
       },
       "original": {
@@ -69,8 +71,8 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "hs-bindgen": "hs-bindgen",
-        "libclang": "libclang",
+        "hs-bindgen-src": "hs-bindgen-src",
+        "libclang-bindings-src": "libclang-bindings-src",
         "nixpkgs": "nixpkgs"
       }
     },

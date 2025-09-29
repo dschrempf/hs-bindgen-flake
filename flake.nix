@@ -5,13 +5,13 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-  inputs.libclang = {
-    url = "github:well-typed/libclang";
+  inputs.libclang-bindings-src = {
+    url = "github:well-typed/libclang/dom/loosen-bounds";
     flake = false;
   };
 
-  inputs.hs-bindgen = {
-    url = "github:well-typed/hs-bindgen";
+  inputs.hs-bindgen-src = {
+    url = "github:well-typed/hs-bindgen/dom/1019/loosen-bounds";
     flake = false;
   };
 
@@ -21,65 +21,24 @@
       flake-utils,
       nixpkgs,
       #
-      libclang,
-      hs-bindgen,
+      libclang-bindings-src,
+      hs-bindgen-src,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        hsBindgenPkgNames = [
-          "ansi-diff"
-          "c-expr-runtime"
-          "c-expr-dsl"
-          "hs-bindgen"
-          "hs-bindgen-runtime"
-          "hs-bindgen-test-runtime"
-        ];
-        hMkPackage = { callCabal2nix, ... }: name: callCabal2nix name ("${hs-bindgen}/${name}") { };
-        hOverlay = nfinal: nprev: {
-          haskell = nprev.haskell // {
-            packageOverrides =
-              hfinal: hprev:
-              nprev.haskell.packageOverrides hfinal hprev
-              // nixpkgs.lib.genAttrs hsBindgenPkgNames (hMkPackage hfinal)
-              // {
-                libclang-bindings = hfinal.callCabal2nix "libclang-bindings" "${libclang}" { };
-              }
-              // {
-                debruijn = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.debruijn);
-                # See https://gitlab.haskell.org/ghc/ghc/-/issues/25681.
-                # optics = nfinal.haskell.lib.dontCheck hprev.optics;
-                skew-list = nfinal.haskell.lib.doJailbreak (nfinal.haskell.lib.markUnbroken hprev.skew-list);
-              };
-          };
-        };
-        # NOTE: May be used to overwrite the version of `rust-bindgen` which has
-        # to align with the one used to create the fixtures.
-        rOverlay = final: prev: {
-          rust-bindgen-unwrapped = prev.rust-bindgen-unwrapped.overrideAttrs (old: rec {
-            version = "0.71.1";
-            src = prev.fetchCrate {
-              pname = "bindgen-cli";
-              inherit version;
-              hash = "sha256-RL9P0dPYWLlEGgGWZuIvyULJfH+c/B+3sySVadJQS3w=";
-            };
-            cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-              pname = old.pname;
-              inherit version src;
-              hash = "sha256-4EyDjHreFFFSGf7UoftCh6eI/8nfIP1ANlYWq0K8a3I=";
-            };
-          });
-        };
+        libclangBindingsOverlay = import ./nix/libclang-bindings.nix { inherit libclang-bindings-src; };
+        hsBindgenOverlay = import ./nix/hs-bindgen.nix { inherit hs-bindgen-src; };
+        hsFixesOverlay = import ./nix/overrides.nix;
+        rustBindgenOverlay = import ./nix/rust-bindgen.nix;
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
-            hOverlay
-            rOverlay
+            libclangBindingsOverlay
+            hsBindgenOverlay
+            hsFixesOverlay
+            rustBindgenOverlay
           ];
-        };
-        hsBindgenHook = pkgs.callPackage ./nix/hsBindgenHook.nix { };
-        hsBindgen = pkgs.callPackage ./nix/hsBindgen.nix {
-          inherit hsBindgenHook;
         };
         devShellWith =
           {
@@ -88,7 +47,8 @@
             additionalPackages ? [ ],
             appendToShellHook ? "",
           }:
-          pkgs.mkShell {
+          haskellPackages.shellFor {
+            packages = p: [ p.hs-bindgen ];
             nativeBuildInputs = [
               # Haskell.
               haskellPackages.cabal-install
@@ -111,7 +71,7 @@
               # `clangStdenv` Nixpkgs overlay, but that requires recompilation
               # of the complete toolchain; see, e.g.,
               # https://nixos.wiki/wiki/Using_Clang_instead_of_GCC.
-              hsBindgenHook
+              pkgs.hsBindgenHook
             ]
             ++
               # Additional packages (e.g., of example libraries to generate
@@ -125,12 +85,12 @@
               export LD_LIBRARY_PATH
             ''
             + appendToShellHook;
+            withHoogle = true;
           };
       in
       {
         packages = {
-          inherit hsBindgenHook;
-          inherit hsBindgen;
+          inherit (pkgs) hsBindgenHook hsBindgenCli;
         };
 
         devShells = {

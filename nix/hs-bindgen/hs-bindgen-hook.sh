@@ -1,5 +1,8 @@
 # Populate additional environment variables required by `hs-bindgen`.
 
+# NOTE: Use this setup hook when building packages with `hs-bindgen`. The client
+# requires a separate wrapper (doh !) which is defined in `hs-bindgen-cli.nix`.
+# Please keep this setup hook and the wrapper synchronized!
 populateHsBindgenEnv() {
     # Inform `hs-bindgen` about Nix-specific `CFLAGS` and `CCFLAGS`. In contrast
     # to `rust-bindgen-hook.sh` (see Nixpkgs), we do not set `CXXFLAGS`.

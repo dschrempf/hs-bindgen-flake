@@ -6,12 +6,12 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   inputs.libclang-bindings-src = {
-    url = "github:well-typed/libclang/dom/loosen-bounds";
+    url = "github:well-typed/libclang";
     flake = false;
   };
 
   inputs.hs-bindgen-src = {
-    url = "github:well-typed/hs-bindgen/dom/1019/loosen-bounds";
+    url = "github:well-typed/hs-bindgen";
     flake = false;
   };
 

@@ -44,7 +44,7 @@
         in
         {
           packages = {
-            inherit (pkgs) hsBindgenHook hsBindgenCli;
+            inherit (pkgs) hsBindgenHook hs-bindgen-cli;
           };
 
           devShells = hsBindgenDev.matrix // {

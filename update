@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "> Update Nix Flake lock file"
+nix flake update
+
+ghcs=(ghc98 ghc912)
+llvms=(llvm19)
+
+build_dir="build"
+
+for ghc in "${ghcs[@]}"; do
+    for llvm in "${llvms[@]}"; do
+        profile="${ghc}.${llvm}"
+        echo "> Profile: ${profile}"
+        echo ">> Remove links to old profiles"
+        rm -fv "${build_dir}/${profile}"*
+        echo ">> Create new profile"
+        nix develop --profile "${build_dir}/${profile}" .#"matrix.${profile}" \
+            --command bash -c "ghc --version"
+        echo ">> ↑ GHC version in profile ${profile}"
+    done
+done
+
+git add flake.lock
+git commit -m "toolchain update"

@@ -47,8 +47,7 @@
             inherit (pkgs) hsBindgenHook hsBindgenCli;
           };
 
-          devShells = {
-            inherit (hsBindgenDev) matrix;
+          devShells = hsBindgenDev.matrix // {
             default = hsBindgenDev.devShellWith {
               inherit (pkgs) haskellPackages llvmPackages;
             };

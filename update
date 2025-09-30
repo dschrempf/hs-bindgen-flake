@@ -17,7 +17,7 @@ for ghc in "${ghcs[@]}"; do
         echo ">> Remove links to old profiles"
         rm -fv "${build_dir}/${profile}"*
         echo ">> Create new profile"
-        nix develop --profile "${build_dir}/${profile}" .#"matrix.${profile}" \
+        nix develop --profile "${build_dir}/${profile}" .#"${profile}" \
             --command bash -c "ghc --version"
         echo ">> ↑ GHC version in profile ${profile}"
     done

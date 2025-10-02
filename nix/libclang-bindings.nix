@@ -5,7 +5,7 @@
 final: prev:
 let
   hlib = final.haskell.lib.compose;
-  inherit (prev.llvmPackages) libclang llvm;
+  inherit (final.llvmPackages) libclang llvm;
 in
 {
   haskell = prev.haskell // {

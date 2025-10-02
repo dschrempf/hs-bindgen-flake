@@ -22,7 +22,7 @@ in
     packageOverrides =
       hfinal: hprev:
       let
-        hsBindgenPkgs = mkHsBindgenPkgs hprev;
+        hsBindgenPkgs = mkHsBindgenPkgs hfinal;
       in
       prev.haskell.packageOverrides hfinal hprev
       // {
@@ -34,7 +34,7 @@ in
         c-expr-runtime = hlib.dontCheck hsBindgenPkgs.c-expr-runtime;
         hs-bindgen = hlib.addBuildDepends [ final.hsBindgenHook ] (
           hlib.addTestToolDepends [
-            prev.rust-bindgen
+            final.rust-bindgen
           ] hsBindgenPkgs.hs-bindgen
         );
       };

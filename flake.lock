@@ -21,11 +21,11 @@
     "hs-bindgen-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1759390378,
-        "narHash": "sha256-0QqV9dOs0lsjTF38hFBJj8Dvc0AOfyHDow/jnRMeFz8=",
+        "lastModified": 1759395402,
+        "narHash": "sha256-ZX39o8dGHiOVwNY+Nxi1MIvVHY6t8nadrkrNm6W7D6U=",
         "owner": "well-typed",
         "repo": "hs-bindgen",
-        "rev": "601727eebd3a1194a0009822758b2924df5be004",
+        "rev": "2645fd3dc0b33fd6b4586b6152f5272fdaa39018",
         "type": "github"
       },
       "original": {

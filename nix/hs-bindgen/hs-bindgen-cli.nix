@@ -22,6 +22,5 @@ stdenv.mkDerivation {
     wrapProgram $out/bin/hs-bindgen-cli \
       --set-default BINDGEN_EXTRA_CLANG_ARGS "$(<${llvmPackages.clang}/nix-support/cc-cflags) $(<${llvmPackages.clang}/nix-support/libc-cflags) $NIX_CFLAGS_COMPILE" \
       --set-default BINDGEN_BUILTIN_INCLUDE_DIR disable
-      # No need to set the linker library path LD_LIBRARY_PATH here.
   '';
 }

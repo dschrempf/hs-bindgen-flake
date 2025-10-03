@@ -14,13 +14,6 @@ populateHsBindgenEnv() {
     # `BINDGEN_EXTRA_CLANG_ARGS`).
     BINDGEN_BUILTIN_INCLUDE_DIR=disable
     export BINDGEN_BUILTIN_INCLUDE_DIR
-
-    # TODO: Setting the linker library path still seems to be necessary, because
-    # otherwise TH issues a warning that it cannot find `libclang.so`. However,
-    # the actual call to `libclang` does find all libraries due to
-    # BINDGEN_EXTRA_CLANG_ARGS (see `bindgenHook` provided by Nixpkgs).
-    LD_LIBRARY_PATH="@libclang@/lib"
-    export LD_LIBRARY_PATH
 }
 
 postHook="${postHook:-}"$'\n'"populateHsBindgenEnv"$'\n'

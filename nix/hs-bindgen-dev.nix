@@ -57,7 +57,12 @@ let
         PROJECT_ROOT=$(git rev-parse --show-toplevel)
         export PROJECT_ROOT
 
-        LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c''${LD_LIBRARY_PATH:+:''${LD_LIBRARY_PATH}}"
+        # TODO: Adding `libclang` to the linker library path still seems to be
+        # necessary, because otherwise TH issues a warning that it cannot find
+        # `libclang.so`. However, the actual call to `libclang` does find all
+        # libraries due to BINDGEN_EXTRA_CLANG_ARGS (see `bindgenHook` provided
+        # by Nixpkgs).
+        LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c:${llvmPackages.libclang.lib}/lib''${LD_LIBRARY_PATH:+:''${LD_LIBRARY_PATH}}"
         export LD_LIBRARY_PATH
       ''
       + appendToShellHook;

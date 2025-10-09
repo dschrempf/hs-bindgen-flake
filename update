@@ -5,8 +5,8 @@ set -e
 echo "> Update Nix Flake lock file"
 nix flake update
 
-ghcs=(ghc98 ghc912)
-llvms=(llvm19)
+ghcs=(ghc910 ghc912)
+llvms=(llvm21)
 
 build_dir="build"
 

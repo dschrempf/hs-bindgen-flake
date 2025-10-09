@@ -6,9 +6,13 @@ let
   lib = pkgs.lib;
   hpkgs = pkgs.haskell.packages;
   ghcs = {
-    ghc98 = hpkgs.ghc98;
-    ghc910 = hpkgs.ghc910;
-    ghc912 = hpkgs.ghc912;
+    inherit (hpkgs)
+      ghc94
+      ghc96
+      ghc98
+      ghc910
+      ghc912
+      ;
   };
   llvms = {
     llvm18 = pkgs.llvmPackages_18;

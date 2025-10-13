@@ -22,8 +22,8 @@ let
   };
   devShellWith =
     {
-      haskellPackages,
-      llvmPackages,
+      haskellPackages ? pkgs.haskellPackages,
+      llvmPackages ? pkgs.llvmPackages,
       additionalPackages ? [ ],
       appendToShellHook ? "",
     }:

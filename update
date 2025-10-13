@@ -24,4 +24,4 @@ for ghc in "${ghcs[@]}"; do
 done
 
 git add flake.lock
-git commit -m "toolchain update"
+# git commit -m "toolchain update"

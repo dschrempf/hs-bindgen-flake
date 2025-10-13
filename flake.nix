@@ -57,9 +57,7 @@
           };
 
           devShells = hsBindgenDev.devShells // {
-            default = hsBindgenDev.devShellWith {
-              inherit (pkgs) haskellPackages llvmPackages;
-            };
+            default = pkgs.callPackage hsBindgenDev.devShellWith { };
             # Example `libpcap`.
             pcap = hsBindgenDev.devShellWith {
               haskellPackages = pkgs.haskell.packages.ghc912;

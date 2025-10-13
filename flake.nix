@@ -1,31 +1,30 @@
 {
-  description = "hs-bindgen development environment";
+  description = "Automatically generate Haskell bindings from C header files";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
-  inputs.libclang-bindings-src = {
-    url = "github:well-typed/libclang";
-    flake = false;
-  };
-
-  inputs.hs-bindgen-src = {
-    url = "github:well-typed/hs-bindgen";
-    flake = false;
+  inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    libclang-bindings-src = {
+      url = "github:well-typed/libclang";
+      flake = false;
+    };
+    hs-bindgen-src = {
+      url = "github:well-typed/hs-bindgen";
+      flake = false;
+    };
   };
 
   outputs =
-    {
-      self,
-      flake-utils,
+    inputs@{
+      flake-parts,
       nixpkgs,
       #
       libclang-bindings-src,
       hs-bindgen-src,
+      ...
     }:
     let
-
+      lib = nixpkgs.lib;
       libclangBindingsOverlay = import ./nix/libclang-bindings.nix { inherit libclang-bindings-src; };
       hsBindgenOverlay = import ./nix/hs-bindgen.nix { inherit hs-bindgen-src; };
       hsFixesOverlay = import ./nix/overrides.nix;
@@ -36,18 +35,29 @@
         hsFixesOverlay
         rustBindgenOverlay
       ];
+    in
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ ];
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
       perSystem =
-        system:
+        { system, ... }:
         let
-          pkgs = import nixpkgs { inherit system overlays; };
+          pkgs = import inputs.nixpkgs { inherit overlays system; };
           hsBindgenDev = import ./nix/hs-bindgen-dev.nix { inherit pkgs; };
         in
         {
+          _module.args.pkgs = pkgs;
+
           packages = {
             inherit (pkgs) hsBindgenHook hs-bindgen-cli;
           };
 
-          devShells = hsBindgenDev.matrix // {
+          devShells = hsBindgenDev.devShells // {
             default = hsBindgenDev.devShellWith {
               inherit (pkgs) haskellPackages llvmPackages;
             };
@@ -73,10 +83,8 @@
               '';
             };
           };
+
         };
-    in
-    {
-      overlays.default = nixpkgs.lib.composeManyExtensions overlays;
-    }
-    // flake-utils.lib.eachDefaultSystem perSystem;
+      flake.overlays.default = lib.composeManyExtensions overlays;
+    };
 }

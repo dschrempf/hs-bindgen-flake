@@ -12,7 +12,7 @@ build_dir="build"
 
 for ghc in "${ghcs[@]}"; do
     for llvm in "${llvms[@]}"; do
-        profile="${ghc}.${llvm}"
+        profile="${ghc}-${llvm}"
         echo "> Profile: ${profile}"
         echo ">> Remove links to old profiles"
         rm -fv "${build_dir}/${profile}"*

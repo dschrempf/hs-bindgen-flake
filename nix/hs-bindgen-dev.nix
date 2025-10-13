@@ -72,17 +72,16 @@ let
       + appendToShellHook;
       withHoogle = true;
     };
-  matrix = lib.mapAttrs (
-    _: hpkgs:
-    lib.mapAttrs (
-      _: lpkgs:
-      devShellWith {
+  devShells = lib.concatMapAttrs (
+    h: hpkgs:
+    lib.concatMapAttrs (l: lpkgs: {
+      "${h}-${l}" = devShellWith {
         haskellPackages = hpkgs;
         llvmPackages = lpkgs;
-      }
-    ) llvms
+      };
+    }) llvms
   ) ghcs;
 in
 {
-  inherit matrix devShellWith;
+  inherit devShells devShellWith;
 }

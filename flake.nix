@@ -84,6 +84,14 @@
           };
 
         };
-      flake.overlays.default = lib.composeManyExtensions overlays;
+      flake.overlays = {
+        default = lib.composeManyExtensions overlays;
+        inherit
+          libclangBindingsOverlay
+          hsBindgenOverlay
+          hsFixesOverlay
+          rustBindgenOverlay
+          ;
+      };
     };
 }

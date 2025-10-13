@@ -1,38 +1,41 @@
 {
-  pkgs,
+  nixpkgs,
+  overlays,
 }:
 
+{ system, pkgs', ... }:
+
 let
-  hsBindgenDev = import ./hs-bindgen-dev.nix { inherit pkgs; };
+  pkgsHs = import nixpkgs {
+    inherit system;
+    overlays = [ overlays.default ];
+  };
+  hsBindgenDev = import ./hs-bindgen-dev.nix { pkgs = pkgsHs; };
 in
 {
-  _module.args.pkgs = pkgs;
-
   packages = {
-    inherit (pkgs) hsBindgenHook hs-bindgen-cli;
+    inherit (pkgsHs) hsBindgenHook hs-bindgen-cli;
   };
 
   devShells = hsBindgenDev.devShells // {
-    default = pkgs.callPackage hsBindgenDev.devShellWith { };
-    # Example `libpcap`.
+    default = pkgsHs.callPackage hsBindgenDev.devShellWith { };
     pcap = hsBindgenDev.devShellWith {
-      haskellPackages = pkgs.haskell.packages.ghc912;
-      llvmPackages = pkgs.llvmPackages;
+      haskellPackages = pkgsHs.haskell.packages.ghc912;
+      llvmPackages = pkgsHs.llvmPackages;
       additionalPackages = [
-        pkgs.libpcap
+        pkgs'.libpcap
       ];
     };
-    # Example `wlroots`.
     wlroots = hsBindgenDev.devShellWith {
-      haskellPackages = pkgs.haskell.packages.ghc912;
-      llvmPackages = pkgs.llvmPackages;
+      haskellPackages = pkgsHs.haskell.packages.ghc912;
+      llvmPackages = pkgsHs.llvmPackages;
       additionalPackages = [
-        pkgs.pixman
-        pkgs.wayland
-        pkgs.wlroots
+        pkgs'.pixman
+        pkgs'.wayland
+        pkgs'.wlroots
       ];
       appendToShellHook = ''
-        BINDGEN_EXTRA_CLANG_ARGS="-isystem ${pkgs.wlroots}/include/wlroots-0.19 ''${BINDGEN_EXTRA_CLANG_ARGS}"
+        BINDGEN_EXTRA_CLANG_ARGS="-isystem ${pkgs'.wlroots}/include/wlroots-0.19 ''${BINDGEN_EXTRA_CLANG_ARGS}"
       '';
     };
   };

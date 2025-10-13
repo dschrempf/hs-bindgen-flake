@@ -36,19 +36,7 @@
         "aarch64-darwin"
         "x86_64-darwin"
       ];
-      perSystem =
-        {
-          system,
-          ...
-        }:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ overlays.default ];
-          };
-          hsBindgen = import ./nix/hs-bindgen.nix { inherit pkgs; };
-        in
-        hsBindgen;
+      perSystem = import ./nix/hs-bindgen.nix { inherit nixpkgs overlays; };
       flake.overlays = overlays;
     };
 }

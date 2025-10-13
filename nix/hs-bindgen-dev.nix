@@ -62,10 +62,8 @@ let
         export PROJECT_ROOT
 
         # TODO: Adding `libclang` to the linker library path still seems to be
-        # necessary, because otherwise TH issues a warning that it cannot find
-        # `libclang.so`. However, the actual call to `libclang` does find all
-        # libraries due to BINDGEN_EXTRA_CLANG_ARGS (see `bindgenHook` provided
-        # by Nixpkgs).
+        # necessary, because otherwise Template Haskell issues a warning that it
+        # cannot find `libclang.so`.
         LD_LIBRARY_PATH="$PROJECT_ROOT/manual/c:${llvmPackages.libclang.lib}/lib''${LD_LIBRARY_PATH:+:''${LD_LIBRARY_PATH}}"
         export LD_LIBRARY_PATH
       ''

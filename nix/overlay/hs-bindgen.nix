@@ -39,6 +39,6 @@ in
         );
       };
   };
-  hsBindgenHook = final.callPackage ./hs-bindgen/hs-bindgen-hook.nix { };
-  hs-bindgen-cli = final.callPackage ./hs-bindgen/hs-bindgen-cli.nix { };
+  hsBindgenHook = final.callPackage ./../hs-bindgen-hook.nix { };
+  hs-bindgen-cli = final.callPackage ./../hs-bindgen-cli.nix { };
 }

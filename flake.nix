@@ -25,10 +25,14 @@
     }:
     let
       lib = nixpkgs.lib;
-      libclangBindingsOverlay = import ./nix/libclang-bindings.nix { inherit libclang-bindings-src; };
-      hsBindgenOverlay = import ./nix/hs-bindgen.nix { inherit hs-bindgen-src; };
-      hsFixesOverlay = import ./nix/overrides.nix;
-      rustBindgenOverlay = import ./nix/rust-bindgen.nix;
+      libclangBindingsOverlay = import ./nix/overlay/libclang-bindings.nix {
+        inherit libclang-bindings-src;
+      };
+      hsBindgenOverlay = import ./nix/overlay/hs-bindgen.nix {
+        inherit hs-bindgen-src;
+      };
+      hsFixesOverlay = import ./nix/overlay/overrides.nix;
+      rustBindgenOverlay = import ./nix/overlay/rust-bindgen.nix;
       overlays = [
         libclangBindingsOverlay
         hsBindgenOverlay

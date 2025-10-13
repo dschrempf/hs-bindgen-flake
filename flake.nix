@@ -24,21 +24,10 @@
       ...
     }:
     let
-      lib = nixpkgs.lib;
-      libclangBindingsOverlay = import ./nix/overlay/libclang-bindings.nix {
-        inherit libclang-bindings-src;
+      overlays = import ./nix/overlay {
+        lib = nixpkgs.lib;
+        inherit libclang-bindings-src hs-bindgen-src;
       };
-      hsBindgenOverlay = import ./nix/overlay/hs-bindgen.nix {
-        inherit hs-bindgen-src;
-      };
-      hsFixesOverlay = import ./nix/overlay/overrides.nix;
-      rustBindgenOverlay = import ./nix/overlay/rust-bindgen.nix;
-      overlays = [
-        libclangBindingsOverlay
-        hsBindgenOverlay
-        hsFixesOverlay
-        rustBindgenOverlay
-      ];
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
@@ -48,52 +37,18 @@
         "x86_64-darwin"
       ];
       perSystem =
-        { system, ... }:
-        let
-          pkgs = import inputs.nixpkgs { inherit overlays system; };
-          hsBindgenDev = import ./nix/hs-bindgen-dev.nix { inherit pkgs; };
-        in
         {
-          _module.args.pkgs = pkgs;
-
-          packages = {
-            inherit (pkgs) hsBindgenHook hs-bindgen-cli;
+          system,
+          ...
+        }:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ overlays.default ];
           };
-
-          devShells = hsBindgenDev.devShells // {
-            default = pkgs.callPackage hsBindgenDev.devShellWith { };
-            # Example `libpcap`.
-            pcap = hsBindgenDev.devShellWith {
-              haskellPackages = pkgs.haskell.packages.ghc912;
-              llvmPackages = pkgs.llvmPackages;
-              additionalPackages = [
-                pkgs.libpcap
-              ];
-            };
-            # Example `wlroots`.
-            wlroots = hsBindgenDev.devShellWith {
-              haskellPackages = pkgs.haskell.packages.ghc912;
-              llvmPackages = pkgs.llvmPackages;
-              additionalPackages = [
-                pkgs.pixman
-                pkgs.wayland
-                pkgs.wlroots
-              ];
-              appendToShellHook = ''
-                BINDGEN_EXTRA_CLANG_ARGS="-isystem ${pkgs.wlroots}/include/wlroots-0.19 ''${BINDGEN_EXTRA_CLANG_ARGS}"
-              '';
-            };
-          };
-
-        };
-      flake.overlays = {
-        default = lib.composeManyExtensions overlays;
-        inherit
-          libclangBindingsOverlay
-          hsBindgenOverlay
-          hsFixesOverlay
-          rustBindgenOverlay
-          ;
-      };
+          hsBindgen = import ./nix/hs-bindgen.nix { inherit pkgs; };
+        in
+        hsBindgen;
+      flake.overlays = overlays;
     };
 }

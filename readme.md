@@ -1,3 +1,7 @@
+We have integrated this Nix Flake into the upstream [`hs-bindgen` repository](https://github.com/well-typed/hs-bindgen).
+
+# Nix Flake for `hs-bindgen`
+
 This Nix Flake provides resources related to
 [`hs-bindgen`](https://github.com/well-typed/hs-bindgen), which automatically
 generates Haskell bindings from C header files.
